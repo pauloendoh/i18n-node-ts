@@ -1,37 +1,20 @@
-import type { Application, NextFunction, Request, Response } from "express";
+import type { Application, Request, Response } from "express";
 import express from "express";
 import { Service } from "./service/Service";
 import { httpContext } from "./utils/httpContext/httpContext";
+import { localeMiddleware } from "./utils/i18n/localeMiddleware";
 
 const app: Application = express();
+app.use(httpContext.middleware);
+
+// test by using accept-language header = 'en' or 'es'
+app.get("/:name", localeMiddleware, async (req: Request, res: Response) => {
+  const { name } = req.params;
+  const service = new Service();
+
+  const text = await service.getHello(name);
+  res.send(text);
+});
 
 const port = 3001;
-
-const service = new Service();
-
-app.use(httpContext.middleware);
-app.get("/favicon.ico", (_req, res) => res.status(204));
-
-app.get(
-  "/:name/:millis",
-  localeMiddleware,
-  async (req: Request, res: Response) => {
-    const { name, millis } = req.params;
-
-    httpContext.set("name", name);
-
-    const text = await service.getHello(Number(millis));
-
-    res.send(text);
-  }
-);
-
 app.listen(port, () => console.log(`App is listening on port ${port}`));
-
-function localeMiddleware(req: Request, res: Response, next: NextFunction) {
-  const locale = req.headers["accept-language"] || "en";
-
-  // app.use(httpContext.middleware) must be set for this to work
-  httpContext.set("locale", locale);
-  next();
-}

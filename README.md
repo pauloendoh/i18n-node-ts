@@ -1,4 +1,4 @@
-A i18n implementation at Node using TypeScript, Express and express-http-context middleware.
+An i18n implementation in Node using TypeScript, Express and express-http-context middleware.
 
 ##### Execution:
 
